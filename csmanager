@@ -7,6 +7,7 @@ use Illuminate\Events\Dispatcher as IllDispatcher;
 use Manager\Config;
 use Manager\Exceptions\FileNotFoundException;
 use Manager\MigrationManager;
+use Manager\Models\Map;
 use React\Datagram\Factory as Datagram;
 use React\EventLoop\Factory as EventLoop;
 use Symfony\Component\Debug\ErrorHandler;
@@ -27,10 +28,10 @@ echo "-- CSManager v{$version} --\r\n";
 echo "Loading configuration file...\r\n";
 
 try {
-	$config = new Config();
+    $config = new Config();
 } catch (FileNotFoundException $e) {
-	echo "There was an error loading the config file. {$e->getMessage()}\r\n";
-	die(1);
+    echo "There was an error loading the config file. {$e->getMessage()}\r\n";
+    die(1);
 }
 
 echo "Loaded config file.\r\n";
@@ -38,30 +39,30 @@ echo "Loaded config file.\r\n";
 echo "Setting up database...\r\n";
 
 try {
-	$capsule = new Capsule;
-	$capsule->addConnection($config['database']);
+    $capsule = new Capsule;
+    $capsule->addConnection($config['database']);
 
-	$capsule->setEventDispatcher(new IllDispatcher(new IllContainer));
+    $capsule->setEventDispatcher(new IllDispatcher(new IllContainer));
 
-	$capsule->setAsGlobal();
-	$capsule->bootEloquent();
+    $capsule->setAsGlobal();
+    $capsule->bootEloquent();
 } catch (\Exception $e) {
-	echo "There was an error setting up the database. {$e->getMessage()}\r\n";
-	die(1);
+    echo "There was an error setting up the database. {$e->getMessage()}\r\n";
+    die(1);
 }
 
 if (count($argv) > 1) {
-	switch ($argv[1]) {
-		case 'migrate':
-			$migrations = new MigrationManager($config);
-			$migrations->run();
-			break;
-		default:
-			echo "Unknown paramater {$argv[1]}.\r\n";
-			break;
-	}
+    switch ($argv[1]) {
+        case 'migrate':
+            $migrations = new MigrationManager($config);
+            $migrations->run();
+            break;
+        default:
+            echo "Unknown paramater {$argv[1]}.\r\n";
+            break;
+    }
 
-	die;
+    die;
 }
 
 $loop = EventLoop::create();
