@@ -1,0 +1,70 @@
+#!/usr/bin/env php
+<?php
+
+use Illuminate\Container\Container as IllContainer;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Events\Dispatcher as IllDispatcher;
+use Manager\Config;
+use Manager\Exceptions\FileNotFoundException;
+use Manager\MigrationManager;
+use React\Datagram\Factory as Datagram;
+use React\EventLoop\Factory as EventLoop;
+use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\Debug\ExceptionHandler;
+
+include 'vendor/autoload.php';
+
+// Define some things on runtime
+define('MANAGER_STARTTIME', microtime(true));
+define('MANAGER_BASE_DIR', __DIR__);
+
+ErrorHandler::register();
+
+$version = '0.0.1-alpha';
+
+echo "-- CSManager v{$version} --\r\n";
+
+echo "Loading configuration file...\r\n";
+
+try {
+	$config = new Config();
+} catch (FileNotFoundException $e) {
+	echo "There was an error loading the config file. {$e->getMessage()}\r\n";
+	die(1);
+}
+
+echo "Loaded config file.\r\n";
+
+echo "Setting up database...\r\n";
+
+try {
+	$capsule = new Capsule;
+	$capsule->addConnection($config['database']);
+
+	$capsule->setEventDispatcher(new IllDispatcher(new IllContainer));
+
+	$capsule->setAsGlobal();
+	$capsule->bootEloquent();
+} catch (\Exception $e) {
+	echo "There was an error setting up the database. {$e->getMessage()}\r\n";
+	die(1);
+}
+
+if (count($argv) > 1) {
+	switch ($argv[1]) {
+		case 'migrate':
+			$migrations = new MigrationManager($config);
+			$migrations->run();
+			break;
+		default:
+			echo "Unknown paramater {$argv[1]}.\r\n";
+			break;
+	}
+
+	die;
+}
+
+$loop = EventLoop::create();
+$udp = new Datagram($loop);
+
+$loop->run();

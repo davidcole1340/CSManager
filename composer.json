@@ -1,0 +1,23 @@
+{
+    "name": "david-cole/cs-manager",
+    "description": "CS:GO Match Manager",
+    "require": {
+        "react/event-loop": "^0.4.1",
+        "react/datagram": "^1.0",
+        "illuminate/database": "^5.2",
+        "illuminate/events": "^5.2",
+        "symfony/debug": "^3.0"
+    },
+    "license": "UNLICENSED",
+    "authors": [
+        {
+            "name": "David",
+            "email": "david@team-reflex.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Manager\\": "src/Manager"
+        }
+    }
+}
