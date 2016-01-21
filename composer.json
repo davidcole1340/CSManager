@@ -6,7 +6,8 @@
         "react/datagram": "^1.0",
         "illuminate/database": "^5.2",
         "illuminate/events": "^5.2",
-        "symfony/debug": "^3.0"
+        "symfony/debug": "^3.0",
+        "koraktor/steam-condenser": "dev-master"
     },
     "license": "UNLICENSED",
     "authors": [

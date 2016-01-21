@@ -9,10 +9,18 @@
  * with this source code in the LICENSE file.
  */
 
-namespace Manager\Models;
+namespace Manager\Events;
 
-use Manager\Model;
+use Manager\Event;
 
-class User extends Model
+class UserConnected extends Event
 {
+    /**
+     * Handles the event.
+     *
+     * @param string $data
+     */
+    public function handle($data)
+    {
+    }
 }

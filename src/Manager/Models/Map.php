@@ -1,13 +1,17 @@
 <?php
 
+/*
+ * This file is apart of the CSManager project.
+ *
+ * Copyright (c) 2016 David Cole <david@team-reflex.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the LICENSE file.
+ */
+
 namespace Manager\Models;
 
 use Manager\Model;
-use Manager\Models\MapScore;
-use Manager\Models\Match;
-use Manager\Models\Player;
-use Manager\Models\Round;
-use Manager\Models\RoundEvent;
 
 class Map extends Model
 {
@@ -34,7 +38,7 @@ class Map extends Model
     /**
      * Relationship between multiple players.
      *
-     * @return HasMany 
+     * @return HasMany
      */
     public function players()
     {
@@ -44,7 +48,7 @@ class Map extends Model
     /**
      * Relationship between multiple RoundEvents.
      *
-     * @return HasMany 
+     * @return HasMany
      */
     public function roundevents()
     {
@@ -54,7 +58,7 @@ class Map extends Model
     /**
      * Relationship between mutliple Rounds.
      *
-     * @return HasMany 
+     * @return HasMany
      */
     public function rounds()
     {

@@ -1,20 +1,24 @@
 <?php
 
+/*
+ * This file is apart of the CSManager project.
+ *
+ * Copyright (c) 2016 David Cole <david@team-reflex.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the LICENSE file.
+ */
+
 namespace Manager\Models;
 
 use Manager\Model;
-use Manager\Models\Event;
-use Manager\Models\Map;
-use Manager\Models\Ruleset;
-use Manager\Models\Server;
-use Manager\Models\Team;
 
 class Match extends Model
 {
     /**
-     * Relationship between multiple maps
+     * Relationship between multiple maps.
      *
-     * @return HasMany 
+     * @return HasMany
      */
     public function maps()
     {
@@ -24,7 +28,7 @@ class Match extends Model
     /**
      * Relationship between an Event.
      *
-     * @return BelongsTo 
+     * @return BelongsTo
      */
     public function event()
     {
@@ -34,7 +38,7 @@ class Match extends Model
     /**
      * Relationship between a Server.
      *
-     * @return BelongsTo 
+     * @return BelongsTo
      */
     public function server()
     {
@@ -44,7 +48,7 @@ class Match extends Model
     /**
      * Relationship between a Team.
      *
-     * @return HasOne 
+     * @return HasOne
      */
     public function teamA()
     {
@@ -54,7 +58,7 @@ class Match extends Model
     /**
      * Relationship between a Team.
      *
-     * @return HasOne 
+     * @return HasOne
      */
     public function teamB()
     {
@@ -64,7 +68,7 @@ class Match extends Model
     /**
      * Relationship between a Ruleset.
      *
-     * @return BelongsTo 
+     * @return BelongsTo
      */
     public function ruleset()
     {

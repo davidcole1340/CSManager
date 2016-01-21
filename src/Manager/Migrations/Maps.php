@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is apart of the CSManager project.
+ *
+ * Copyright (c) 2016 David Cole <david@team-reflex.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the LICENSE file.
+ */
+
 namespace Manager\Migrations;
 
 class Maps
@@ -7,13 +16,12 @@ class Maps
     /**
      * Runs the migrations.
      *
-     * @param Blueprint $table 
-     * @return void 
+     * @param Blueprint $table
      */
     public static function up($table)
     {
         $table->increments('id');
-        
+
         $table->integer('match_id')->unsigned();
         $table->foreign('match_id')->references('id')
                                    ->on('matches')
@@ -24,7 +32,7 @@ class Maps
         $table->integer('score_b')->default(0);
         $table->integer('current_round')->default(0);
 
-        /**
+        /*
          * Statuses:
          * 
          *  1. Not Started
@@ -44,7 +52,7 @@ class Maps
         $table->boolean('is_paused')->default(false);
 
         $table->string('current_side')->default('ct');
-        
+
         $table->timestamps();
     }
 }

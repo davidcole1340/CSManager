@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is apart of the CSManager project.
+ *
+ * Copyright (c) 2016 David Cole <david@team-reflex.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the LICENSE file.
+ */
+
 namespace Manager;
 
 use Manager\Exceptions\FileNotFoundException;
@@ -9,14 +18,14 @@ class Config implements \ArrayAccess
     /**
      * The config file name.
      *
-     * @var string 
+     * @var string
      */
     protected $file = 'config.json';
 
     /**
      * The config array.
      *
-     * @var array 
+     * @var array
      */
     protected $config;
 
@@ -24,17 +33,16 @@ class Config implements \ArrayAccess
      * Opens the config file and stores the data.
      *
      * @param string|null $file
-     * @return void
      */
     public function __construct($file = null)
     {
-        if (!empty($file)) {
+        if (! empty($file)) {
             $this->file = $file;
         }
 
-        $file = MANAGER_BASE_DIR . "/{$this->file}";
+        $file = MANAGER_BASE_DIR."/{$this->file}";
 
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             throw new FileNotFoundException("The file {$file} could not be found.");
         }
 
@@ -44,12 +52,12 @@ class Config implements \ArrayAccess
     /**
      * Saves the config file.
      *
-     * @return boolean 
+     * @return bool
      */
     public function saveConfig()
     {
         $json = json_encode($this->config);
-        file_put_contents(MANAGER_BASE_DIR . "/{$this->file}",    $json);
+        file_put_contents(MANAGER_BASE_DIR."/{$this->file}",    $json);
 
         return true;
     }
@@ -58,8 +66,7 @@ class Config implements \ArrayAccess
      * Sets an offset on the config file.
      *
      * @param mixed $offset
-     * @param mixed $value 
-     * @return void 
+     * @param mixed $value
      */
     public function offsetSet($offset, $value)
     {
@@ -73,8 +80,9 @@ class Config implements \ArrayAccess
     /**
      * Checks if an offset exists.
      *
-     * @param mixed $offset 
-     * @return boolean 
+     * @param mixed $offset
+     *
+     * @return bool
      */
     public function offsetExists($offset)
     {
@@ -84,8 +92,7 @@ class Config implements \ArrayAccess
     /**
      * Unsets an offset.
      *
-     * @param mixed $offset 
-     * @return void 
+     * @param mixed $offset
      */
     public function offsetUnset($offset)
     {
@@ -95,8 +102,9 @@ class Config implements \ArrayAccess
     /**
      * Gets an offset.
      *
-     * @param mixed $offset 
-     * @return mixed 
+     * @param mixed $offset
+     *
+     * @return mixed
      */
     public function offsetGet($offset)
     {

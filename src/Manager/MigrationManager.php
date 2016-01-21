@@ -1,9 +1,17 @@
 <?php
 
+/*
+ * This file is apart of the CSManager project.
+ *
+ * Copyright (c) 2016 David Cole <david@team-reflex.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the LICENSE file.
+ */
+
 namespace Manager;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Manager\Config;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class MigrationManager
@@ -11,36 +19,35 @@ class MigrationManager
     /**
      * The Config instance.
      *
-     * @var Config 
+     * @var Config
      */
     protected $config;
 
     /**
      * Array of migrations.
      *
-     * @var array 
+     * @var array
      */
     protected $migrations = [
-        'users'         => Migrations\Users::class,
+        'users' => Migrations\Users::class,
 
-        'rulesets'      => Migrations\Rulesets::class,
-        'events'        => Migrations\Events::class,
-        'teams'         => Migrations\Teams::class,
-        'servers'       => Migrations\Servers::class,
-        'matches'       => Migrations\Matches::class,
-        'maps'          => Migrations\Maps::class,
+        'rulesets' => Migrations\Rulesets::class,
+        'events' => Migrations\Events::class,
+        'teams' => Migrations\Teams::class,
+        'servers' => Migrations\Servers::class,
+        'matches' => Migrations\Matches::class,
+        'maps' => Migrations\Maps::class,
         // 'map_match'	=> Migrations\MapMatchPivot::class,
-        'map_scores'    => Migrations\MapScores::class,
-        'players'       => Migrations\Players::class,
-        'round_events'  => Migrations\RoundEvents::class,
-        'rounds'        => Migrations\Rounds::class
+        'map_scores' => Migrations\MapScores::class,
+        'players' => Migrations\Players::class,
+        'round_events' => Migrations\RoundEvents::class,
+        'rounds' => Migrations\Rounds::class,
     ];
 
     /**
      * Creates a Migration Manager instance.
      *
-     * @param Config $config 
-     * @return void
+     * @param Config $config
      */
     public function __construct(Config $config)
     {
@@ -50,24 +57,24 @@ class MigrationManager
     /**
      * Runs the migrations.
      *
-     * @return boolean 
+     * @return bool
      */
     public function run()
     {
         foreach ($this->migrations as $table => $migration) {
-            echo "Migrating `{$table}`\r\n";
+            Logger::log("Migrating `{$table}`");
             try {
                 Capsule::schema()->create($table, function ($table) use ($migration) {
                     $migration::up($table);
                 });
             } catch (FatalThrowableError $e) {
-                echo "Error migrating table `{$table}`: {$e->getMessage()}\r\n";
+                Logger::log("Error migrating table `{$table}`: {$e->getMessage()}", Logger::LEVEL_ERROR);
             } catch (\PDOException $e) {
-                echo "Error migrating table `{$table}`, table likely already created.\r\n";
+                Logger::log("Error migrating table `{$table}`, table likely already created.", Logger::LEVEL_ERROR);
             }
         }
 
-        echo "Finished migrating.\r\n";
+        Logger::log('Finished migrating.');
 
         return true;
     }

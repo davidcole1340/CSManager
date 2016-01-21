@@ -1,19 +1,18 @@
 #!/usr/bin/env php
-<?php
+<?php include 'vendor/autoload.php';
 
 use Illuminate\Container\Container as IllContainer;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher as IllDispatcher;
 use Manager\Config;
 use Manager\Exceptions\FileNotFoundException;
+use Manager\Logger;
 use Manager\MigrationManager;
 use Manager\Models\Map;
 use React\Datagram\Factory as Datagram;
 use React\EventLoop\Factory as EventLoop;
+use React\Stream\Stream;
 use Symfony\Component\Debug\ErrorHandler;
-use Symfony\Component\Debug\ExceptionHandler;
-
-include 'vendor/autoload.php';
 
 // Define some things on runtime
 define('MANAGER_STARTTIME', microtime(true));
@@ -23,31 +22,32 @@ ErrorHandler::register();
 
 $version = '0.0.1-alpha';
 
-echo "-- CSManager v{$version} --\r\n";
-
-echo "Loading configuration file...\r\n";
+Logger::log("-- CSManager v{$version} --", 0);
+Logger::log('Loading configuration file...');
 
 try {
     $config = new Config();
 } catch (FileNotFoundException $e) {
-    echo "There was an error loading the config file. {$e->getMessage()}\r\n";
+    Logger::log("There was an error loading the config file. {$e->getMessage()}", Logger::LEVEL_EMERG);
     die(1);
 }
 
-echo "Loaded config file.\r\n";
+Logger::setLevel($config['logger']['level']);
 
-echo "Setting up database...\r\n";
+Logger::log('Loaded config file.');
+
+Logger::log('Setting up database...');
 
 try {
-    $capsule = new Capsule;
+    $capsule = new Capsule();
     $capsule->addConnection($config['database']);
 
-    $capsule->setEventDispatcher(new IllDispatcher(new IllContainer));
+    $capsule->setEventDispatcher(new IllDispatcher(new IllContainer()));
 
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 } catch (\Exception $e) {
-    echo "There was an error setting up the database. {$e->getMessage()}\r\n";
+    Logger::log("There was an error setting up the database. {$e->getMessage()}", Logger::LEVEL_EMERG);
     die(1);
 }
 
@@ -58,7 +58,7 @@ if (count($argv) > 1) {
             $migrations->run();
             break;
         default:
-            echo "Unknown paramater {$argv[1]}.\r\n";
+            Logger::log("Unknown paramater {$argv[1]}.", Logger::LEVEL_ALERT);
             break;
     }
 
@@ -67,5 +67,37 @@ if (count($argv) > 1) {
 
 $loop = EventLoop::create();
 $udp = new Datagram($loop);
+
+$loop->addPeriodicTimer(3, function () use ($udp) {
+    Logger::log('Looking for maps...', Logger::LEVEL_INFO);
+    $maps = Map::where('status', 2)->get();
+
+    foreach ($maps as $map) {
+        $ipCheck = Map::where('status', '>=', 2)->where('status', '<', 12)->get();
+        $inUse = false;
+
+        foreach ($ipCheck as $mapCheck) {
+            if ($mapCheck->match->server_id == $map->match->server_id) {
+                Logger::log("Map #{$map->id} could not be started due to #{$mapCheck->id} using the same server.");
+                $inUse = true;
+                break;
+            }
+        }
+
+        if (! $inUse) {
+            $udp->createClient("{$map->match->server->ip}:{$map->match->server->port}")->then(function (Stream $stream) use ($map) {
+                Logger::log("Map #{$map->id} starting on server #{$map->match->server->id}.");
+                $handler = new Handler($map, $stream);
+                $handler->initMap();
+
+                $stream->on('message', function ($data, $serverAddr, $stream) use ($handler) {
+                    $handler->handleData($data);
+                });
+            });
+        }
+    }
+
+    Logger::log('Finished, waiting 3 seconds until we check again.', Logger::LEVEL_INFO);
+});
 
 $loop->run();

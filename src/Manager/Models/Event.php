@@ -1,17 +1,24 @@
 <?php
 
+/*
+ * This file is apart of the CSManager project.
+ *
+ * Copyright (c) 2016 David Cole <david@team-reflex.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the LICENSE file.
+ */
+
 namespace Manager\Models;
 
 use Manager\Model;
-use Manager\Models\Match;
-use Manager\Models\Team;
 
 class Event extends Model
 {
     /**
      * Relationship between multiple matches.
      *
-     * @return HasMany 
+     * @return HasMany
      */
     public function matches()
     {
@@ -21,7 +28,7 @@ class Event extends Model
     /**
      * Relationship between multiple teams.
      *
-     * @return HasMany 
+     * @return HasMany
      */
     public function teams()
     {

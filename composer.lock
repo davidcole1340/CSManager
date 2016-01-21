@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "79218120928787e12cd03a97ad55976f",
-    "content-hash": "1e5701d7ad7013b8b2f1b7b6729c5b83",
+    "hash": "db3b94c1ac9e98a7f9193e3403188543",
+    "content-hash": "114e8abf255dbd235c169454a14a032c",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -365,6 +365,136 @@
             "description": "The Illuminate Support package.",
             "homepage": "http://laravel.com",
             "time": "2016-01-07 11:02:28"
+        },
+        {
+            "name": "koraktor/steam-condenser",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/koraktor/steam-condenser-php.git",
+                "reference": "92dde9e3b462e93cc498fe795a712c61eec7051e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/koraktor/steam-condenser-php/zipball/92dde9e3b462e93cc498fe795a712c61eec7051e",
+                "reference": "92dde9e3b462e93cc498fe795a712c61eec7051e",
+                "shasum": ""
+            },
+            "require": {
+                "monolog/monolog": "~1.10",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpdocumentor/phpdocumentor": "~2.6.1",
+                "phpunit/phpunit": "~4.1.3"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/SteamCondenser.php"
+                ],
+                "psr-4": {
+                    "SteamCondenser\\": "lib/SteamCondenser"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Staudt",
+                    "email": "koraktor@gmail.com"
+                }
+            ],
+            "description": "The Steam Condenser is a library for querying the Steam Community, Source and GoldSrc game servers",
+            "homepage": "http://koraktor.de/steam-condenser",
+            "keywords": [
+                "community",
+                "goldsrc",
+                "query",
+                "source",
+                "steam",
+                "webapi"
+            ],
+            "time": "2015-11-05 07:13:44"
+        },
+        {
+            "name": "monolog/monolog",
+            "version": "1.17.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
+                "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "psr/log": "~1.0"
+            },
+            "provide": {
+                "psr/log-implementation": "1.0.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "^2.4.9",
+                "doctrine/couchdb": "~1.0@dev",
+                "graylog2/gelf-php": "~1.0",
+                "jakub-onderka/php-parallel-lint": "0.9",
+                "php-console/php-console": "^3.1.3",
+                "phpunit/phpunit": "~4.5",
+                "phpunit/phpunit-mock-objects": "2.3.0",
+                "raven/raven": "^0.13",
+                "ruflin/elastica": ">=0.90 <3.0",
+                "swiftmailer/swiftmailer": "~5.3",
+                "videlalvaro/php-amqplib": "~2.4"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
+                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+                "ext-mongo": "Allow sending log messages to a MongoDB server",
+                "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "php-console/php-console": "Allow sending log messages to Google Chrome",
+                "raven/raven": "Allow sending log messages to a Sentry server",
+                "rollbar/rollbar": "Allow sending log messages to Rollbar",
+                "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
+                "videlalvaro/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.16.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Monolog\\": "src/Monolog"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+            "homepage": "http://github.com/Seldaek/monolog",
+            "keywords": [
+                "log",
+                "logging",
+                "psr-3"
+            ],
+            "time": "2015-10-14 12:51:02"
         },
         {
             "name": "nesbot/carbon",
@@ -943,7 +1073,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "koraktor/steam-condenser": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
