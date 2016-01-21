@@ -12,8 +12,8 @@ EOF;
 Symfony\CS\Fixer\Contrib\HeaderCommentFixer::setHeader($header);
 
 $fixers = [
-	'header_comment',
-	'blankline_after_open_tag',
+    'header_comment',
+    'blankline_after_open_tag',
     'braces',
     'concat_without_spaces',
     'double_arrow_multiline_whitespaces',
