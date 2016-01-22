@@ -12,6 +12,7 @@
 namespace Manager;
 
 use Manager\Models\Map;
+use SteamCondenser\Servers\SourceServer;
 
 abstract class Event
 {
@@ -34,8 +35,10 @@ abstract class Event
      *
      * @param Map          $map
      * @param SourceServer $rcon
+     *
+     * @return void
      */
-    public function __construct(Map $map, $rcon)
+    public function __construct(Map $map, SourceServer $rcon)
     {
         $this->map = $map;
         $this->rcon = $rcon;

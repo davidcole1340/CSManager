@@ -18,9 +18,11 @@ class UserConnected extends Event
     /**
      * Handles the event.
      *
-     * @param string $data
+     * @param string $matches
+     *
+     * @return void
      */
-    public function handle($data)
+    public function handle($matches)
     {
     }
 }

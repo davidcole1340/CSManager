@@ -76,6 +76,7 @@ $fixers = [
     'unused_use',
     'visibility',
     'whitespacy_lines',
+    '-phpdoc_no_empty_return'
 ];
 
 return Symfony\CS\Config\Config::create()

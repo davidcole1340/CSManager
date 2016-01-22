@@ -11,6 +11,9 @@
 
 namespace Handler;
 
+use Manager\Models\Map;
+use SteamCondenser\Servers\SourceServer;
+
 class Regex
 {
     /**
@@ -106,9 +109,16 @@ class Regex
 
     /**
      * Constructs a new regex matcher.
+     *
+     * @param Map          $map
+     * @param SourceServer $rcon
+     *
+     * @return void
      */
-    public function __construct()
+    public function __construct(Map $map, SourceServer $rcon)
     {
+        $this->map = $map;
+        $this->rcon = $rcon;
     }
 
     /**
@@ -120,13 +130,15 @@ class Regex
      */
     public function match($data)
     {
+        $this->map = $this->map->fresh();
+
         foreach ($this->patterns as $regex) {
             if (isset($regex['ignore']) && $regex['ignore']) {
                 continue;
             }
 
             if (preg_match($regex['pattern'], $data, $matches)) {
-                (new $regex['class']())->handle();
+                (new $regex['class']($this->map, $this->rcon))->handle($matches);
 
                 return true;
             }

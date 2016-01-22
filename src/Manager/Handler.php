@@ -50,6 +50,8 @@ class Handler
      *
      * @param Map    $map
      * @param Stream $stream
+     *
+     * @return void
      */
     public function __construct($map, $stream)
     {
@@ -64,6 +66,8 @@ class Handler
      * Handles incoming data.
      *
      * @param string $data
+     *
+     * @return void
      */
     public function handleData($data)
     {
@@ -72,15 +76,23 @@ class Handler
 
     /**
      * Initilizes the map.
+     *
+     * @return void
      */
     public function initMap()
     {
-        $this->rcon->send("changelevel \"{$this->map->map}\"");
-        $this->rcon->send("sv_password \"{$this->map->match->password}\"");
+        $this->rcon->send("log on; logaddress_add \"{$this->map->match->server->ip}:{$this->map->match->server->port}\";");
+
+        $this->rcon->send("changelevel \"{$this->map->map}\";");
+        $this->rcon->send("sv_password \"{$this->map->match->password}\";");
+
+        $this->initTeams();
     }
 
     /**
      * Initilizes the Rcon instance.
+     *
+     * @return void
      */
     public function initRcon()
     {
@@ -95,12 +107,24 @@ class Handler
     }
 
     /**
-     * Initilizes the handler.
+     * Initilizes the team names.
+     *
+     * @return void
      */
-    public function initHandler()
+    public function initTeams()
     {
-        $this->handler->on('message', function ($data) {
-            $this->handleData($data);
-        });
+        $teams[1] = ($this->map->current_side == 'ct') ? $this->map->match->teamA : $this->map->match->teamB;
+        $teams[2] = ($this->map->current_side == 't') ? $this->map->match->teamA : $this->map->match->teamB;
+
+        for ($i = 1; $i <= 2; ++$i) {
+            $team = $teams[$i];
+
+            $this->rcon->send("mp_teamname_{$i} \"{$team->name}\";");
+            $this->rcon->send("mp_teamflag_{$i} \"{$team->flag}\";");
+
+            if (isset($team->logo)) {
+                $this->rcon->send("mp_teamlogo_{$i} \"{$team->logo}\";");
+            }
+        }
     }
 }

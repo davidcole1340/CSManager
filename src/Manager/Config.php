@@ -33,6 +33,8 @@ class Config implements \ArrayAccess
      * Opens the config file and stores the data.
      *
      * @param string|null $file
+     *
+     * @return void
      */
     public function __construct($file = null)
     {
@@ -67,6 +69,8 @@ class Config implements \ArrayAccess
      *
      * @param mixed $offset
      * @param mixed $value
+     *
+     * @return void
      */
     public function offsetSet($offset, $value)
     {

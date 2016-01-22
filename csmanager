@@ -10,15 +10,12 @@ use Manager\Logger;
 use Manager\MigrationManager;
 use Manager\Models\Map;
 use React\Datagram\Factory as Datagram;
+use React\Datagram\Socket;
 use React\EventLoop\Factory as EventLoop;
-use React\Stream\Stream;
-use Symfony\Component\Debug\ErrorHandler;
 
 // Define some things on runtime
 define('MANAGER_STARTTIME', microtime(true));
 define('MANAGER_BASE_DIR', __DIR__);
-
-ErrorHandler::register();
 
 $version = '0.0.1-alpha';
 
@@ -65,10 +62,31 @@ if (count($argv) > 1) {
     die;
 }
 
+Logger::log('Initilizing EventLoop...');
+
 $loop = EventLoop::create();
 $udp = new Datagram($loop);
+$maps = [];
 
-$loop->addPeriodicTimer(3, function () use ($udp) {
+$udp->createServer("{$config['udp']['ip']}:{$config['udp']['port']}")->then(function (Socket $socket) use (&$config, &$maps) {
+    Logger::log("UDP Server running on {$config['udp']['ip']}:{$config['udp']['port']}");
+
+    $socket->on('message', function ($data, $addr) use (&$maps) {
+        $data = rtrim(substr($data, 5));
+
+        if (isset($maps[$addr])) {
+            $map = $maps[$addr];
+
+            $map['handler']->handleData($data);
+        }
+    });
+}, function ($e) {
+    throw $e;
+});
+
+$loop->run();
+
+$loop->addPeriodicTimer(3, function () use ($udp, &$maps) {
     Logger::log('Looking for maps...', Logger::LEVEL_INFO);
     $maps = Map::where('status', 2)->get();
 
@@ -85,15 +103,13 @@ $loop->addPeriodicTimer(3, function () use ($udp) {
         }
 
         if (! $inUse) {
-            $udp->createClient("{$map->match->server->ip}:{$map->match->server->port}")->then(function (Stream $stream) use ($map) {
-                Logger::log("Map #{$map->id} starting on server #{$map->match->server->id}.");
-                $handler = new Handler($map, $stream);
-                $handler->initMap();
+            Logger::log("Map #{$map->id} starting on server #{$map->match->server->id}.");
+            $handler = new Handler($map, $stream);
+            $handler->initMap();
 
-                $stream->on('message', function ($data, $serverAddr, $stream) use ($handler) {
-                    $handler->handleData($data);
-                });
-            });
+            $maps[$map->match->server->ip.':'.$map->match->server->port] = [
+                'handler' => $handler,
+            ];
         }
     }
 

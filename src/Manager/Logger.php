@@ -44,6 +44,8 @@ class Logger
      *
      * @param string $message
      * @param int    $level
+     *
+     * @return void
      */
     public static function log($message, $level = 6)
     {
@@ -60,6 +62,8 @@ class Logger
      * level.
      *
      * @param int $level
+     *
+     * @return void
      */
     public static function setLevel($level)
     {

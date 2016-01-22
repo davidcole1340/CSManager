@@ -30,14 +30,12 @@ class MigrationManager
      */
     protected $migrations = [
         'users' => Migrations\Users::class,
-
         'rulesets' => Migrations\Rulesets::class,
         'events' => Migrations\Events::class,
         'teams' => Migrations\Teams::class,
         'servers' => Migrations\Servers::class,
         'matches' => Migrations\Matches::class,
         'maps' => Migrations\Maps::class,
-        // 'map_match'	=> Migrations\MapMatchPivot::class,
         'map_scores' => Migrations\MapScores::class,
         'players' => Migrations\Players::class,
         'round_events' => Migrations\RoundEvents::class,
@@ -48,6 +46,8 @@ class MigrationManager
      * Creates a Migration Manager instance.
      *
      * @param Config $config
+     *
+     * @return void
      */
     public function __construct(Config $config)
     {
@@ -58,14 +58,16 @@ class MigrationManager
      * Runs the migrations.
      *
      * @return bool
+     * @return void
      */
     public function run()
     {
         foreach ($this->migrations as $table => $migration) {
             Logger::log("Migrating `{$table}`");
             try {
+                $migration = new $migration();
                 Capsule::schema()->create($table, function ($table) use ($migration) {
-                    $migration::up($table);
+                    $migration->up($table);
                 });
             } catch (FatalThrowableError $e) {
                 Logger::log("Error migrating table `{$table}`: {$e->getMessage()}", Logger::LEVEL_ERROR);
