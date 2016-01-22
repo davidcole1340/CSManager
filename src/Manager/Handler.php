@@ -12,10 +12,10 @@
 namespace Manager;
 
 use Closure;
-use Handler\Regex;
 use Manager\Chat\DefaultChat;
-use SteamCondenser\Exceptions\RCONNoAuthException;
-use SteamCondenser\Servers\SourceServer;
+use Reflex\Rcon\Exceptions\RconAuthException;
+use Reflex\Rcon\Exceptions\RconConnectException;
+use Reflex\Rcon\Rcon;
 
 class Handler
 {
@@ -34,6 +34,13 @@ class Handler
     protected $stream;
 
     /**
+     * The Config instance.
+     *
+     * @var Config
+     */
+    public $config;
+
+    /**
      * The regex matcher.
      *
      * @var Regex
@@ -43,7 +50,7 @@ class Handler
     /**
      * The Rcon client instance.
      *
-     * @var SourceServer
+     * @var Rcon
      */
     public $rcon;
 
@@ -59,16 +66,18 @@ class Handler
      *
      * @param Map    $map
      * @param Stream $stream
+     * @param Config $config
      *
      * @return void
      */
-    public function __construct($map, $stream)
+    public function __construct($map, $stream, &$config)
     {
         $this->map = $map;
         $this->stream = $stream;
-        $this->regex = new Regex();
+        $this->config = $config;
 
         $this->initRcon();
+        $this->regex = new Regex($map, $this->rcon);
     }
 
     /**
@@ -90,13 +99,19 @@ class Handler
      */
     public function initMap()
     {
-        $this->rcon->send("log on; logaddress_add \"{$this->map->match->server->ip}:{$this->map->match->server->port}\";");
+        $this->rcon->exec("log on; logaddress_add \"{$this->map->match->server->ip}:{$this->map->match->server->port}\";");
 
-        $this->rcon->send("changelevel \"{$this->map->map}\";");
-        $this->rcon->send("sv_password \"{$this->map->match->password}\";");
+        $this->rcon->setTimeout(10); // Server doesn't respond until map has fully changed.
+        $this->rcon->exec("changelevel \"{$this->map->map}\";");
+        $this->rcon->setTimeout();
+
+        $this->rcon->exec("sv_password \"{$this->map->match->password}\";");
 
         $this->initTeams();
         $this->initSayReady();
+
+        $this->map->status = 3;
+        $this->map->save();
     }
 
     /**
@@ -107,11 +122,16 @@ class Handler
     public function initRcon()
     {
         try {
-            $rcon = new SourceServer($this->map->match->server->ip, $this->map->match->server->port);
-            $rcon->rconAuth($this->map->match->server->rcon);
-        } catch (RCONNoAuthException $e) {
+            $rcon = new Rcon($this->map->match->server->ip, $this->map->match->server->port, $this->map->match->server->rcon);
+            Logger::log("connecting to rcon {$this->map->match->server->ip}:{$this->map->match->server->port}", Logger::LEVEL_DEBUG);
+            $rcon->connect();
+        } catch (RconConnectException $e) {
+            Logger::log("Could not connect to the CS:GO server. {$e->getMessage()}", Logger::LEVEL_ERROR);
+        } catch (RconAuthException $e) {
             Logger::log("Could not authenticate with the CS:GO server. {$e->getMessage()}", Logger::LEVEL_ERROR);
         }
+
+        Logger::log('successfully connected to rcon', Logger::LEVEL_DEBUG);
 
         $this->rcon = $rcon;
         $this->chat = new DefaultChat($this->rcon); // temp
@@ -125,16 +145,16 @@ class Handler
     public function initTeams()
     {
         $teams[1] = ($this->map->current_side == 'ct') ? $this->map->match->teamA : $this->map->match->teamB;
-        $teams[2] = ($this->map->current_side == 't') ? $this->map->match->teamA : $this->map->match->teamB;
+        $teams[2] = ($this->map->current_side == 'ct') ? $this->map->match->teamB : $this->map->match->teamA;
 
         for ($i = 1; $i <= 2; ++$i) {
             $team = $teams[$i];
 
-            $this->rcon->send("mp_teamname_{$i} \"{$team->name}\";");
-            $this->rcon->send("mp_teamflag_{$i} \"{$team->flag}\";");
+            $this->rcon->exec("mp_teamname_{$i} \"{$team->name}\";");
+            $this->rcon->exec("mp_teamflag_{$i} \"{$team->flag}\";");
 
             if (isset($team->logo)) {
-                $this->rcon->send("mp_teamlogo_{$i} \"{$team->logo}\";");
+                $this->rcon->exec("mp_teamlogo_{$i} \"{$team->logo}\";");
             }
         }
     }
@@ -146,20 +166,33 @@ class Handler
      */
     public function initSayReady()
     {
-        $this->ready = $this->loopFunctions['createTimer'](5, function () {
+        Logger::log('creating !ready timer, runs every 10 secs', Logger::LEVEL_DEBUG);
+        $this->ready = $this->loopFunctions['createTimer'](10, function () {
             $this->chat->sendMessage('Once your team is ready, type !ready in chat.');
         });
     }
 
     /**
-     * Sets the closure to create a timer.
+     * Kills the timer to say !ready.
      *
+     * @return void
+     */
+    public function killSayReady()
+    {
+        Logger::log('killing !ready timer', Logger::LEVEL_DEBUG);
+        $this->loopFunctions['killTimer']($this->ready);
+    }
+
+    /**
+     * Adds a loop closure.
+     *
+     * @param string   $key
      * @param \Closure $closure
      *
      * @return void
      */
-    public function setCreateTimer(Closure $closure)
+    public function addLoopClosure($key, Closure $closure)
     {
-        $this->loopFunctions['createTimer'] = $closure;
+        $this->loopFunctions[$key] = $closure;
     }
 }

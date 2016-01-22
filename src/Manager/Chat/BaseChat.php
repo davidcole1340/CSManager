@@ -11,26 +11,37 @@
 
 namespace Manager\Chat;
 
-use SteamCondenser\Servers\SourceServer;
+use Reflex\Rcon\Rcon;
 
 class BaseChat implements ChatInterface
 {
     /**
-     * The SourceServer instance.
+     * The Rcon instance.
      *
-     * @var SourceServer
+     * @var Rcon
      */
     protected $rcon;
 
     /**
      * Constructs a chat messenger.
      *
-     * @param SourceServer $rcon
+     * @param Rcon $rcon
      *
      * @return void
      */
-    public function __construct(SourceServer $rcon)
+    public function __construct(Rcon $rcon)
     {
         $this->rcon = $rcon;
+    }
+
+    /**
+     * Sends a message to the game chat.
+     *
+     * @param string $message
+     *
+     * @return void
+     */
+    public function sendMessage($message)
+    {
     }
 }

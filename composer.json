@@ -7,7 +7,7 @@
         "illuminate/database": "^5.2",
         "illuminate/events": "^5.2",
         "symfony/debug": "^3.0",
-        "koraktor/steam-condenser": "dev-master"
+        "team-reflex/rcon-php": "^1.0"
     },
     "license": "UNLICENSED",
     "authors": [

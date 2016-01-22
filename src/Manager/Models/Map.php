@@ -16,6 +16,16 @@ use Manager\Model;
 class Map extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'match_id', 'map', 'score_a', 'score_b', 'current_round', 'status',
+        'is_paused', 'current_side', 't_ready', 'ct_ready',
+    ];
+
+    /**
      * Relationship between a Match.
      *
      * @return BelongsTo

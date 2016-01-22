@@ -22,6 +22,6 @@ class DefaultChat extends BaseChat
      */
     public function sendMessage($message)
     {
-        $this->rcon->send("say \"[CSManager] {$message}\"");
+        $this->rcon->exec("say [CSManager] {$message}");
     }
 }

@@ -16,6 +16,16 @@ use Manager\Model;
 class Match extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'event_id', 'server_id', 'team_a', 'team_b', 'ruleset',
+        'status', 'starting', 'password', 'auth_key', 'best_of',
+    ];
+
+    /**
      * Relationship between multiple maps.
      *
      * @return HasMany
@@ -62,7 +72,7 @@ class Match extends Model
      */
     public function teamB()
     {
-        return $this->hasOne(Team::class, 'id', 'team_a');
+        return $this->hasOne(Team::class, 'id', 'team_b');
     }
 
     /**

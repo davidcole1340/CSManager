@@ -16,6 +16,15 @@ use Manager\Model;
 class RoundEvent extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'map_id', 'current_round', 'type', 'text',
+    ];
+
+    /**
      * Relationship between a Map.
      *
      * @return BelongsTo

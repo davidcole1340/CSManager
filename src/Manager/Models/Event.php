@@ -16,6 +16,15 @@ use Manager\Model;
 class Event extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name', 'subtitle', 'active', 'link', 'description',
+    ];
+
+    /**
      * Relationship between multiple matches.
      *
      * @return HasMany

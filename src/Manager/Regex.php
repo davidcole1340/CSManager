@@ -9,10 +9,10 @@
  * with this source code in the LICENSE file.
  */
 
-namespace Handler;
+namespace Manager;
 
 use Manager\Models\Map;
-use SteamCondenser\Servers\SourceServer;
+use Reflex\Rcon\Rcon;
 
 class Regex
 {
@@ -110,12 +110,12 @@ class Regex
     /**
      * Constructs a new regex matcher.
      *
-     * @param Map          $map
-     * @param SourceServer $rcon
+     * @param Map  $map
+     * @param Rcon $rcon
      *
      * @return void
      */
-    public function __construct(Map $map, SourceServer $rcon)
+    public function __construct(Map $map, Rcon $rcon)
     {
         $this->map = $map;
         $this->rcon = $rcon;
@@ -127,7 +127,7 @@ class Regex
      * @param string  $data
      * @param Handler $handler
      *
-     * @return bool
+     * @return void
      */
     public function match($data, $handler)
     {
@@ -141,10 +141,10 @@ class Regex
             if (preg_match($regex['pattern'], $data, $matches)) {
                 (new $regex['class']($this->map, $this->rcon, $handler))->handle($matches);
 
-                return true;
+                return;
             }
         }
 
-        return false;
+        Logger::log("could not match data: {$data}", Logger::LEVEL_DEBUG);
     }
 }

@@ -16,6 +16,21 @@ use Manager\Model;
 class Player extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'map_id', 'steam_id', 'username',
+        'kills', 'assists', 'deaths',
+        'points', 'headshots',
+        'plants', 'defuses', 'teamkills',
+        '1k', '2k', '3k', '4k', '5k',
+        '1v1', '1v2', '1v3', '1v4', '1v5',
+        'entries',
+    ];
+
+    /**
      * Relationship between a Map.
      *
      * @return BelongsTo

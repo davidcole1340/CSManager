@@ -12,7 +12,7 @@
 namespace Manager;
 
 use Manager\Models\Map;
-use SteamCondenser\Servers\SourceServer;
+use Reflex\Rcon\Rcon;
 
 abstract class Event
 {
@@ -26,7 +26,7 @@ abstract class Event
     /**
      * The Rcon client that is connected to the server.
      *
-     * @var SourceServer
+     * @var Rcon
      */
     protected $rcon;
 
@@ -40,12 +40,12 @@ abstract class Event
     /**
      * Constructs the event.
      *
-     * @param Map          $map
-     * @param SourceServer $rcon
+     * @param Map  $map
+     * @param Rcon $rcon
      *
      * @return void
      */
-    public function __construct(Map $map, SourceServer $rcon, Handler $handler)
+    public function __construct(Map $map, Rcon $rcon, Handler $handler)
     {
         $this->map = $map;
         $this->rcon = $rcon;

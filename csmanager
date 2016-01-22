@@ -8,6 +8,7 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher as IllDispatcher;
 use Manager\Config;
 use Manager\Exceptions\FileNotFoundException;
+use Manager\Handler;
 use Manager\Logger;
 use Manager\MigrationManager;
 use Manager\Models\Map;
@@ -68,18 +69,21 @@ Logger::log('Initilizing EventLoop...');
 
 $loop = EventLoop::create();
 $udp = new Datagram($loop);
-$maps = [];
+$mapsInProgress = [];
 
-$udp->createServer("{$config['udp']['bind']['ip']}:{$config['udp']['bind']['port']}")->then(function (Socket $socket) use (&$config, &$maps) {
+$udp->createServer("{$config['udp']['bind']['ip']}:{$config['udp']['bind']['port']}")->then(function (Socket $socket) use (&$config, &$mapsInProgress) {
     Logger::log("UDP Server running on {$config['udp']['bind']['ip']}:{$config['udp']['bind']['port']}");
 
-    $socket->on('message', function ($data, $addr) use (&$maps) {
+    $socket->on('message', function ($data, $addr) use (&$mapsInProgress) {
         $data = rtrim(substr($data, 5));
+        Logger::log("recieved data from {$addr}: {$data}", Logger::LEVEL_DEBUG);
 
-        if (isset($maps[$addr])) {
-            $map = $maps[$addr];
+        if (isset($mapsInProgress[$addr])) {
+            $map = $mapsInProgress[$addr];
 
             $map['handler']->handleData($data);
+        } else {
+            Logger::log("data recieved from {$addr} has no handler", Logger::LEVEL_DEBUG);
         }
     });
 }, function ($e) {
@@ -87,14 +91,12 @@ $udp->createServer("{$config['udp']['bind']['ip']}:{$config['udp']['bind']['port
     die(1);
 });
 
-$loop->run();
-
-$loop->addPeriodicTimer(3, function () use ($udp, &$maps) {
+$loop->addPeriodicTimer(3, function () use ($udp, &$mapsInProgress, &$loop) {
     Logger::log('Looking for maps...', Logger::LEVEL_INFO);
     $maps = Map::where('status', 2)->get();
 
     foreach ($maps as $map) {
-        $ipCheck = Map::where('status', '>=', 2)->where('status', '<', 12)->get();
+        $ipCheck = Map::where('status', '>=', 2)->where('status', '<', 12)->where('id', '!=', $map->id)->get();
         $inUse = false;
 
         foreach ($ipCheck as $mapCheck) {
@@ -107,13 +109,19 @@ $loop->addPeriodicTimer(3, function () use ($udp, &$maps) {
 
         if (! $inUse) {
             Logger::log("Map #{$map->id} starting on server #{$map->match->server->id}.");
-            $handler = new Handler($map, $stream);
-            $handler->setCreateTimer(function ($length, callable $closure) use (&$loop) {
+            $handler = new Handler($map, $stream, $config);
+            $handler->addLoopClosure('createTimer', function ($length, callable $closure) use (&$loop) {
                 return $loop->addPeriodicTimer($length, $closure);
+            });
+            $handler->addLoopClosure('killTimer', function ($timer) use (&$loop) {
+                $loop->cancelTimer($timer);
+            });
+            $handler->addLoopClosure('onceTimer', function ($length, callable $closure) use (&$loop) {
+                return $loop->addTimer($Length, $closure);
             });
             $handler->initMap();
 
-            $maps[$map->match->server->ip.':'.$map->match->server->port] = [
+            $mapsInProgress[$map->match->server->ip.':'.$map->match->server->port] = [
                 'handler' => $handler,
             ];
         }

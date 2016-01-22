@@ -72,7 +72,7 @@ class MigrationManager
             } catch (FatalThrowableError $e) {
                 Logger::log("Error migrating table `{$table}`: {$e->getMessage()}", Logger::LEVEL_ERROR);
             } catch (\PDOException $e) {
-                Logger::log("Error migrating table `{$table}`, table likely already created.", Logger::LEVEL_ERROR);
+                Logger::log("Error migrating table `{$table}`: {$e->getMessage()}", Logger::LEVEL_ERROR);
             }
         }
 

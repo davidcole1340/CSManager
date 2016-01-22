@@ -16,6 +16,15 @@ use Manager\Model;
 class Server extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name', 'ip', 'port', 'gotv_ip', 'rcon',
+    ];
+
+    /**
      * Relationship between multiple matches.
      *
      * @return HasMany

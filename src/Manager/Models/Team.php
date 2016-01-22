@@ -16,6 +16,15 @@ use Manager\Model;
 class Team extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'event_id', 'name', 'flag', 'logo',
+    ];
+
+    /**
      * Relationship between multiple Rounds.
      *
      * @return HasMany

@@ -16,6 +16,16 @@ use Manager\Model;
 class MapScore extends Model
 {
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'map_id', 'type', 'team_a_side_1', 'team_a_side_2',
+        'team_b_side_1', 'team_b_side_2',
+    ];
+
+    /**
      * Relationship between a Map.
      *
      * @return BelongsTo
