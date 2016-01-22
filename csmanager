@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php include 'vendor/autoload.php';
 
+error_reporting(E_ERROR | E_PARSE);
+
 use Illuminate\Container\Container as IllContainer;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher as IllDispatcher;
@@ -68,8 +70,8 @@ $loop = EventLoop::create();
 $udp = new Datagram($loop);
 $maps = [];
 
-$udp->createServer("{$config['udp']['ip']}:{$config['udp']['port']}")->then(function (Socket $socket) use (&$config, &$maps) {
-    Logger::log("UDP Server running on {$config['udp']['ip']}:{$config['udp']['port']}");
+$udp->createServer("{$config['udp']['bind']['ip']}:{$config['udp']['bind']['port']}")->then(function (Socket $socket) use (&$config, &$maps) {
+    Logger::log("UDP Server running on {$config['udp']['bind']['ip']}:{$config['udp']['bind']['port']}");
 
     $socket->on('message', function ($data, $addr) use (&$maps) {
         $data = rtrim(substr($data, 5));
@@ -81,7 +83,8 @@ $udp->createServer("{$config['udp']['ip']}:{$config['udp']['port']}")->then(func
         }
     });
 }, function ($e) {
-    throw $e;
+    Logger::log("Unable to create the UDP server. {$e->getMessage()}", Logger::LEVEL_EMERG);
+    die(1);
 });
 
 $loop->run();
@@ -105,6 +108,9 @@ $loop->addPeriodicTimer(3, function () use ($udp, &$maps) {
         if (! $inUse) {
             Logger::log("Map #{$map->id} starting on server #{$map->match->server->id}.");
             $handler = new Handler($map, $stream);
+            $handler->setCreateTimer(function ($length, callable $closure) use (&$loop) {
+                return $loop->addPeriodicTimer($length, $closure);
+            });
             $handler->initMap();
 
             $maps[$map->match->server->ip.':'.$map->match->server->port] = [

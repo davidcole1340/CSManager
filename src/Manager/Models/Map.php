@@ -64,4 +64,24 @@ class Map extends Model
     {
         return $this->hasMany(Round::class);
     }
+
+    /**
+     * Checks if the map is in warmup.
+     * 
+     * @return bool
+     */
+    public function inWarmup()
+    {
+        return $this->status == 3 || $this->status == 6 || $this->status == 8 || $this->status == 10;
+    }
+
+    /**
+     * Checks if the map is in gametime.
+     * 
+     * @return bool
+     */
+    public function inGame()
+    {
+        return $this->status == 7 || $this->status == 9 || $this->status == 11;
+    }
 }

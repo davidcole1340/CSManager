@@ -53,7 +53,7 @@ class Logger
 
         if ($currentLevel >= $level) {
             $prefix = ($level == 0) ? '' : '['.static::$levels[$level].']';
-            echo "{$prefix} {$message}".PHP_EOL;
+            echo " {$prefix} {$message}".PHP_EOL;
         }
     }
 

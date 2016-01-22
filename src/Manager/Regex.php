@@ -124,11 +124,12 @@ class Regex
     /**
      * Attempts to match a Regex pattern.
      *
-     * @param string $data
+     * @param string  $data
+     * @param Handler $handler
      *
      * @return bool
      */
-    public function match($data)
+    public function match($data, $handler)
     {
         $this->map = $this->map->fresh();
 
@@ -138,7 +139,7 @@ class Regex
             }
 
             if (preg_match($regex['pattern'], $data, $matches)) {
-                (new $regex['class']($this->map, $this->rcon))->handle($matches);
+                (new $regex['class']($this->map, $this->rcon, $handler))->handle($matches);
 
                 return true;
             }

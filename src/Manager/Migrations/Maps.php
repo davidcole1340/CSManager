@@ -55,6 +55,9 @@ class Maps
 
         $table->string('current_side')->default('ct');
 
+        $table->boolean('t_ready')->default(false);
+        $table->boolean('ct_ready')->default(false);
+
         $table->timestamps();
     }
 }

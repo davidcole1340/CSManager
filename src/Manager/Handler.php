@@ -11,7 +11,9 @@
 
 namespace Manager;
 
+use Closure;
 use Handler\Regex;
+use Manager\Chat\DefaultChat;
 use SteamCondenser\Exceptions\RCONNoAuthException;
 use SteamCondenser\Servers\SourceServer;
 
@@ -43,7 +45,14 @@ class Handler
      *
      * @var SourceServer
      */
-    protected $rcon;
+    public $rcon;
+
+    /**
+     * The closures that modify the loop.
+     *
+     * @var array
+     */
+    public $loopFunctions;
 
     /**
      * Creates a handler instance.
@@ -71,7 +80,7 @@ class Handler
      */
     public function handleData($data)
     {
-        $this->regex->match($data);
+        $this->regex->match($data, $this);
     }
 
     /**
@@ -87,6 +96,7 @@ class Handler
         $this->rcon->send("sv_password \"{$this->map->match->password}\";");
 
         $this->initTeams();
+        $this->initSayReady();
     }
 
     /**
@@ -104,6 +114,7 @@ class Handler
         }
 
         $this->rcon = $rcon;
+        $this->chat = new DefaultChat($this->rcon); // temp
     }
 
     /**
@@ -126,5 +137,29 @@ class Handler
                 $this->rcon->send("mp_teamlogo_{$i} \"{$team->logo}\";");
             }
         }
+    }
+
+    /**
+     * Initilizes the timer to say !ready.
+     *
+     * @return void
+     */
+    public function initSayReady()
+    {
+        $this->ready = $this->loopFunctions['createTimer'](5, function () {
+            $this->chat->sendMessage('Once your team is ready, type !ready in chat.');
+        });
+    }
+
+    /**
+     * Sets the closure to create a timer.
+     *
+     * @param \Closure $closure
+     *
+     * @return void
+     */
+    public function setCreateTimer(Closure $closure)
+    {
+        $this->loopFunctions['createTimer'] = $closure;
     }
 }

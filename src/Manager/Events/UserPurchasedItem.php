@@ -12,9 +12,8 @@
 namespace Manager\Events;
 
 use Manager\Event;
-use Manager\Models\Player;
 
-class UserConnected extends Event
+class UserPurchasedItem extends Event
 {
     /**
      * Handles the event.
@@ -25,8 +24,15 @@ class UserConnected extends Event
      */
     public function handle($matches)
     {
-        $player = Player::firstOrNew(['map_id' => $this->map->id, 'steam_id' => $matches[3]]);
-        $player->username = $matches[1];
-        $player->save();
+        /*
+    	 * Does nothing by default. If you want it to
+    	 * do something when an Rcon command is sent
+    	 * feel free to.
+    	 *
+    	 * If you do decide to make this do something,
+    	 * make sure to go into src/Manager/Regex.php
+    	 * and remove the 'ignore' => true part.
+    	 */
+        return;
     }
 }

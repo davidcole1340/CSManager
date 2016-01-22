@@ -31,6 +31,13 @@ abstract class Event
     protected $rcon;
 
     /**
+     * The Handler that is attached to the Map.
+     *
+     * @var Handler
+     */
+    protected $handler;
+
+    /**
      * Constructs the event.
      *
      * @param Map          $map
@@ -38,9 +45,10 @@ abstract class Event
      *
      * @return void
      */
-    public function __construct(Map $map, SourceServer $rcon)
+    public function __construct(Map $map, SourceServer $rcon, Handler $handler)
     {
         $this->map = $map;
         $this->rcon = $rcon;
+        $this->handler = $handler;
     }
 }
