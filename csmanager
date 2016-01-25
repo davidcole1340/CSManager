@@ -109,13 +109,7 @@ $loop->addPeriodicTimer(3, function () use ($udp, &$mapsInProgress, &$loop) {
 
         if (! $inUse) {
             Logger::log("Map #{$map->id} starting on server #{$map->match->server->id}.");
-            $handler = new Handler($map, $stream, $config);
-            $handler->addLoopClosure('createTimer', function ($length, callable $closure) use (&$loop) {
-                return $loop->addPeriodicTimer($length, $closure);
-            });
-            $handler->addLoopClosure('killTimer', function ($timer) use (&$loop) {
-                $loop->cancelTimer($timer);
-            });
+            $handler = new Handler($map, $stream, $config, $loop);
             $handler->addLoopClosure('onceTimer', function ($length, callable $closure) use (&$loop) {
                 return $loop->addTimer($Length, $closure);
             });

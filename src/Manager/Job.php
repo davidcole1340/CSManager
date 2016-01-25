@@ -13,12 +13,9 @@ namespace Manager;
 
 use Manager\Models\Map;
 use Reflex\Rcon\Rcon;
-use Manager\Traits\DispatchesJobs;
 
-abstract class Event
+abstract class Job
 {
-    use DispatchesJobs;
-
     /**
      * The Map that the event was fired on.
      *

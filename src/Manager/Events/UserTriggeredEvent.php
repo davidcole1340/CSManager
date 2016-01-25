@@ -60,7 +60,7 @@ class UserTriggeredEvent extends Event
      */
     public function handlePlantedTheBomb()
     {
-        $this->player->plants += 1;
+        ++$this->player->plants;
         $this->player->save();
 
         $re = new RoundEvent();
@@ -80,7 +80,7 @@ class UserTriggeredEvent extends Event
      */
     public function handleDefusedTheBomb()
     {
-        $this->player->defuses += 1;
+        ++$this->player->defuses;
         $this->player->save();
 
         $re = new RoundEvent();

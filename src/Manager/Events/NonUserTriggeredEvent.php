@@ -50,7 +50,7 @@ class NonUserTriggeredEvent extends Event
      */
     public function handleRoundSpawn()
     {
-        $this->map->current_round += 1;
+        ++$this->map->current_round;
         $this->map->save();
     }
 

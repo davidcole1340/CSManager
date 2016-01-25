@@ -12,6 +12,8 @@
 namespace Manager\Events;
 
 use Manager\Event;
+use Manager\Jobs\SetupTeams;
+use Manager\Jobs\StartWarmup;
 use Manager\Logger;
 use Manager\Models\RoundEvent;
 
@@ -90,7 +92,7 @@ class UserSaidSomething extends Event
                 Logger::log("creating timers, {$waittime} waittime");
 
                 for ($i = 1; $i <= $waittime; ++$i) {
-                    $this->handler->loopFunctions['onceTimer']($i, function () use ($i, $waittime) {
+                    $this->handler->loop->addTimer($i, function () use ($i, $waittime) {
                         $diff = $waittime - $i;
                         $this->handler->chat->sendMessage("Match will start in {$diff} second(s).");
                     });
@@ -173,7 +175,7 @@ class UserSaidSomething extends Event
                 $this->map->status = 6;
                 $this->map->save();
 
-                // todo start warmup
+                $this->dispatch(StartWarmup::class);
             }
         }
     }
@@ -200,7 +202,8 @@ class UserSaidSomething extends Event
                 $this->map->current_side = 't';
                 $this->map->save();
 
-                // todo set team names and start warmup
+                $this->dispatch(SetupTeams::class);
+                $this->dispatch(StartWarmup::class);
             }
         }
     }

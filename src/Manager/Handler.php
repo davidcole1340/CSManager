@@ -11,14 +11,17 @@
 
 namespace Manager;
 
-use Closure;
 use Manager\Chat\DefaultChat;
+use Manager\Jobs\SetupTeams;
+use Manager\Traits\DispatchesJobs;
 use Reflex\Rcon\Exceptions\RconAuthException;
 use Reflex\Rcon\Exceptions\RconConnectException;
 use Reflex\Rcon\Rcon;
 
 class Handler
 {
+    use DispatchesJobs;
+
     /**
      * The Map that the handler is handling.
      *
@@ -55,26 +58,28 @@ class Handler
     public $rcon;
 
     /**
-     * The closures that modify the loop.
+     * The ReactPHP event loop.
      *
-     * @var array
+     * @var LoopInterface
      */
-    public $loopFunctions;
+    public $loop;
 
     /**
      * Creates a handler instance.
      *
-     * @param Map    $map
-     * @param Stream $stream
-     * @param Config $config
+     * @param Map           $map
+     * @param Stream        $stream
+     * @param Config        $config
+     * @param LoopInterface $loop
      *
      * @return void
      */
-    public function __construct($map, $stream, &$config)
+    public function __construct($map, $stream, &$config, &$loop)
     {
         $this->map = $map;
         $this->stream = $stream;
         $this->config = $config;
+        $this->loop = $loop;
 
         $this->initRcon();
         $this->regex = new Regex($map, $this->rcon);
@@ -144,19 +149,7 @@ class Handler
      */
     public function initTeams()
     {
-        $teams[1] = ($this->map->current_side == 'ct') ? $this->map->match->teamA : $this->map->match->teamB;
-        $teams[2] = ($this->map->current_side == 'ct') ? $this->map->match->teamB : $this->map->match->teamA;
-
-        for ($i = 1; $i <= 2; ++$i) {
-            $team = $teams[$i];
-
-            $this->rcon->exec("mp_teamname_{$i} \"{$team->name}\";");
-            $this->rcon->exec("mp_teamflag_{$i} \"{$team->flag}\";");
-
-            if (isset($team->logo)) {
-                $this->rcon->exec("mp_teamlogo_{$i} \"{$team->logo}\";");
-            }
-        }
+        $this->dispatch(SetupTeams::class);
     }
 
     /**
@@ -167,7 +160,7 @@ class Handler
     public function initSayReady()
     {
         Logger::log('creating !ready timer, runs every 10 secs', Logger::LEVEL_DEBUG);
-        $this->ready = $this->loopFunctions['createTimer'](10, function () {
+        $this->ready = $this->loop->createPeriodicTimer(10, function () {
             $this->chat->sendMessage('Once your team is ready, type !ready in chat.');
         });
     }
@@ -180,19 +173,6 @@ class Handler
     public function killSayReady()
     {
         Logger::log('killing !ready timer', Logger::LEVEL_DEBUG);
-        $this->loopFunctions['killTimer']($this->ready);
-    }
-
-    /**
-     * Adds a loop closure.
-     *
-     * @param string   $key
-     * @param \Closure $closure
-     *
-     * @return void
-     */
-    public function addLoopClosure($key, Closure $closure)
-    {
-        $this->loopFunctions[$key] = $closure;
+        $this->loop->cancelTimer($this->ready);
     }
 }
