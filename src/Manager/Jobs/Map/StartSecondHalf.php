@@ -9,11 +9,11 @@
  * with this source code in the LICENSE file.
  */
 
-namespace Manager\Jobs;
+namespace Manager\Jobs\Map;
 
 use Manager\Job;
 
-class StartWarmup extends Job
+class StartSecondHalf extends Job
 {
     /**
      * Executes the job.
@@ -22,7 +22,13 @@ class StartWarmup extends Job
      */
     public function execute()
     {
-        $this->rcon->exec('mp_warmuptime 600; mp_warmup_start; mp_warmup_pausetimer 1;');
-        $this->handler->initSayReady();
+        $this->rcon->exec('mp_halftime_pausetimer 0;');
+
+        $this->map->status++;
+        $this->map->save();
+
+        for ($i = 0; $i < 3; ++$i) {
+            $this->handler->chat->sendMessage('LIVE!');
+        }
     }
 }

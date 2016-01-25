@@ -11,6 +11,8 @@
 
 namespace Manager\Traits;
 
+use Manager\Handler;
+
 trait DispatchesJobs
 {
     /**
@@ -23,7 +25,13 @@ trait DispatchesJobs
      */
     public function dispatch($class, array $params = [])
     {
-        $class = new $class($this->map, $this->rcon, $this->handler);
+        if ($this instanceof Handler) {
+            $handler = $this;
+        } else {
+            $handler = $this->handler;
+        }
+
+        $class = new $class($this->map, $this->rcon, $handler);
 
         return call_user_func_array([$class, 'execute'], $params);
     }

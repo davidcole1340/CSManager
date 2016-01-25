@@ -45,7 +45,9 @@ class UserTriggeredEvent extends Event
             'Defused_The_Bomb',
         ];
 
-        if ($key = array_search($message, $handle)) {
+        $key = array_search($message, $handle);
+
+        if ($key !== false) {
             $func = 'handle';
             $func .= ucwords(camel_case($handle[$key]));
 
@@ -67,7 +69,7 @@ class UserTriggeredEvent extends Event
         $re->map_id = $this->map->id;
         $re->current_round = $this->map->current_round;
         $re->type = 'bomb_planted';
-        $re->text = [
+        $re->data = [
             'planter' => $this->player->id,
         ];
         $re->save();
@@ -87,7 +89,7 @@ class UserTriggeredEvent extends Event
         $re->map_id = $this->map->id;
         $re->current_round = $this->map->current_round;
         $re->type = 'bomb_defused';
-        $re->text = [
+        $re->data = [
             'defuser' => $this->player->id,
         ];
         $re->save();

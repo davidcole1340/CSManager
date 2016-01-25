@@ -37,18 +37,18 @@ class Maps
         /*
          * Statuses:
          * 
-         *  1. Not Started
-         *  2. Starting
-         *  3. Pre-Game Warmup
-         *  4. Knife Round
-         *  5. Knife Winners Deciding
-         *  6. First Half Warmup
-         *  7. First Half
-         *  8. Second Half Warmup
-         *  9. Second Half
-         * 10. Overtime Warmup
-         * 11. Overtime
-         * 12. Finished
+         *  0. Not Started
+         *  1. Starting
+         *  2. Pre-Game Warmup
+         *  3. Knife Round
+         *  4. Knife Winners Deciding
+         *  5. First Half Warmup
+         *  6. First Half
+         *  7. Second Half Warmup
+         *  8. Second Half
+         *  9. Overtime Warmup
+         * 10. Overtime
+         * 11. Finished
          */
         $table->integer('status')->default(0);
         $table->boolean('is_paused')->default(false);

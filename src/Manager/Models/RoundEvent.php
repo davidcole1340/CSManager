@@ -21,8 +21,30 @@ class RoundEvent extends Model
      * @var array
      */
     protected $fillable = [
-        'map_id', 'current_round', 'type', 'text',
+        'map_id', 'current_round', 'type', 'data',
     ];
+
+    /**
+     * Sets the `data` attribute.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function setDataAttribute(array $data = [])
+    {
+        $this->attributes['data'] = json_encode($data);
+    }
+
+    /**
+     * Gets the `data` attribute.
+     *
+     * @return array
+     */
+    public function getDataAttribute()
+    {
+        return json_decode($this->attributes['data']);
+    }
 
     /**
      * Relationship between a Map.

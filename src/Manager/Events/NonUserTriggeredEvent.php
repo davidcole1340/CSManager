@@ -13,6 +13,7 @@ namespace Manager\Events;
 
 use Carbon\Carbon;
 use Manager\Event;
+use Manager\Logger;
 use Manager\Models\RoundEvent;
 
 class NonUserTriggeredEvent extends Event
@@ -26,8 +27,7 @@ class NonUserTriggeredEvent extends Event
      */
     public function handle($matches)
     {
-        $sender = $matcher[1];
-        $message = $matcher[2];
+        list(, $sender, $message) = $matches;
 
         $handle = [
             'Round_Spawn',
@@ -35,11 +35,15 @@ class NonUserTriggeredEvent extends Event
             'Round_End',
         ];
 
-        if ($key = array_search($message, $handle)) {
+        $key = array_search($message, $handle);
+
+        if ($key !== false) {
             $func = 'handle';
             $func .= ucwords(camel_case($handle[$key]));
 
             $this->{$func}();
+        } else {
+            Logger::log("{$message} is not a handled event", Logger::LEVEL_DEBUG);
         }
     }
 

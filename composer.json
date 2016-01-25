@@ -6,10 +6,13 @@
         "react/datagram": "^1.0",
         "illuminate/database": "^5.2",
         "illuminate/events": "^5.2",
-        "symfony/debug": "^3.0",
-        "team-reflex/rcon-php": "^1.0"
+        "team-reflex/rcon-php": "^1.0",
+        "nesbot/carbon": "^1.21"
     },
-    "license": "UNLICENSED",
+    "require-dev": {
+        "psy/psysh": "^0.6.1"
+    },
+    "license": "MIT",
     "authors": [
         {
             "name": "David",

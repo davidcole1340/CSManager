@@ -13,7 +13,7 @@ namespace Manager\Jobs;
 
 use Manager\Job;
 
-class StartWarmup extends Job
+class InitBackup extends Job
 {
     /**
      * Executes the job.
@@ -22,7 +22,6 @@ class StartWarmup extends Job
      */
     public function execute()
     {
-        $this->rcon->exec('mp_warmuptime 600; mp_warmup_start; mp_warmup_pausetimer 1;');
-        $this->handler->initSayReady();
+        $this->rcon->exec("mp_backup_round_file \"csmanager_{$this->map->id}\"");
     }
 }

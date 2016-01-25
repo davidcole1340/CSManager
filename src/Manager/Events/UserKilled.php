@@ -12,6 +12,8 @@
 namespace Manager\Events;
 
 use Manager\Event;
+use Manager\Models\Player;
+use Manager\Models\RoundEvent;
 
 class UserKilled extends Event
 {
@@ -40,7 +42,7 @@ class UserKilled extends Event
         $re->map_id = $this->map->id;
         $re->current_round = $this->map->score_a + $this->map->score_b + 1;
         $re->type = 'kill';
-        $re->text = [
+        $re->data = [
             'attacker' => $attacker->id,
             'attacker_location' => $matches[5].' '.$matches[6].' '.$matches[7],
             'attacked' => $attacked->id,

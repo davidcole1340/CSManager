@@ -82,7 +82,7 @@ class Map extends Model
      */
     public function inWarmup()
     {
-        return $this->status == 3 || $this->status == 6 || $this->status == 8 || $this->status == 10;
+        return $this->status == 2 || $this->status == 5 || $this->status == 7 || $this->status == 9;
     }
 
     /**
@@ -92,6 +92,6 @@ class Map extends Model
      */
     public function inGame()
     {
-        return $this->status == 7 || $this->status == 9 || $this->status == 11;
+        return $this->status == 6 || $this->status == 8 || $this->status == 10;
     }
 }

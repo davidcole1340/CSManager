@@ -42,10 +42,10 @@ class Matches
                                  ->on('teams')
                                  ->onDelete('cascade');
 
-        $table->integer('ruleset')->unsigned();
-        $table->foreign('ruleset')->references('id')
-                                  ->on('rulesets')
-                                  ->onDelete('cascade');
+        $table->integer('ruleset_id')->unsigned();
+        $table->foreign('ruleset_id')->references('id')
+                                     ->on('rulesets')
+                                     ->onDelete('cascade');
 
         /*
          * Statuses:

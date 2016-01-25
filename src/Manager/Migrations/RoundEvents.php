@@ -32,7 +32,7 @@ class RoundEvents
         $table->integer('current_round');
 
         $table->string('type');
-        $table->json('text');
+        $table->json('data');
 
         $table->timestamps();
     }

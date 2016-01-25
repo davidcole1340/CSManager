@@ -43,8 +43,9 @@ abstract class Event
     /**
      * Constructs the event.
      *
-     * @param Map  $map
-     * @param Rcon $rcon
+     * @param Map     $map
+     * @param Rcon    $rcon
+     * @param Handler $handler
      *
      * @return void
      */

@@ -29,9 +29,12 @@ class TeamTriggeredEvent extends Event
 
         $handle = [
             'SFUI_Notice_CTs_Win',
+            'SFUI_Notice_Terrorists_Win',
         ];
 
-        if ($key = array_search($message, $handle)) {
+        $key = array_search($message, $handle);
+
+        if ($key !== false) {
             $func = 'handle';
             $func .= ucwords(camel_case($handle[$key]));
 
@@ -49,7 +52,20 @@ class TeamTriggeredEvent extends Event
         $re->data = [
             'team_id' => $team->id,
             'team' => 'CT',
-            'reason' => $data,
+        ];
+        $re->save();
+    }
+
+    public function handleSFUINoticeTerroristsWin()
+    {
+        $team = ($this->map->current_side == 't') ? $this->map->match->teamA : $this->map->match->teamB;
+        $re = new RoundEvent();
+        $re->map_id = $this->map->id;
+        $re->current_round = $this->map->current_round;
+        $re->type = 'round_end';
+        $re->data = [
+            'team_id' => $team->id,
+            'team' => 'TERRORIST',
         ];
         $re->save();
     }

@@ -13,6 +13,7 @@ namespace Manager;
 
 use Manager\Chat\DefaultChat;
 use Manager\Jobs\SetupTeams;
+use Manager\Jobs\StartWarmup;
 use Manager\Traits\DispatchesJobs;
 use Reflex\Rcon\Exceptions\RconAuthException;
 use Reflex\Rcon\Exceptions\RconConnectException;
@@ -65,6 +66,13 @@ class Handler
     public $loop;
 
     /**
+     * The current timers.
+     *
+     * @var array
+     */
+    public $timers;
+
+    /**
      * Creates a handler instance.
      *
      * @param Map           $map
@@ -104,7 +112,9 @@ class Handler
      */
     public function initMap()
     {
-        $this->rcon->exec("log on; logaddress_add \"{$this->map->match->server->ip}:{$this->map->match->server->port}\";");
+        $logaddress = $this->config['udp']['remote']['ip'].':'.$this->config['udp']['remote']['port'];
+        var_dump($logaddress);
+        $this->rcon->exec("log on; logaddress_add \"{$logaddress}\";");
 
         $this->rcon->setTimeout(10); // Server doesn't respond until map has fully changed.
         $this->rcon->exec("changelevel \"{$this->map->map}\";");
@@ -113,10 +123,11 @@ class Handler
         $this->rcon->exec("sv_password \"{$this->map->match->password}\";");
 
         $this->initTeams();
-        $this->initSayReady();
 
-        $this->map->status = 3;
+        $this->map->status = 2;
         $this->map->save();
+
+        $this->dispatch(StartWarmup::class);
     }
 
     /**
@@ -132,8 +143,16 @@ class Handler
             $rcon->connect();
         } catch (RconConnectException $e) {
             Logger::log("Could not connect to the CS:GO server. {$e->getMessage()}", Logger::LEVEL_ERROR);
+            $this->map->status = 0;
+            $this->map->save();
+
+            return;
         } catch (RconAuthException $e) {
             Logger::log("Could not authenticate with the CS:GO server. {$e->getMessage()}", Logger::LEVEL_ERROR);
+            $this->map->status = 0;
+            $this->map->save();
+
+            return;
         }
 
         Logger::log('successfully connected to rcon', Logger::LEVEL_DEBUG);
@@ -160,7 +179,7 @@ class Handler
     public function initSayReady()
     {
         Logger::log('creating !ready timer, runs every 10 secs', Logger::LEVEL_DEBUG);
-        $this->ready = $this->loop->createPeriodicTimer(10, function () {
+        $this->timers['ready'] = $this->loop->addPeriodicTimer(10, function () {
             $this->chat->sendMessage('Once your team is ready, type !ready in chat.');
         });
     }
@@ -173,6 +192,23 @@ class Handler
     public function killSayReady()
     {
         Logger::log('killing !ready timer', Logger::LEVEL_DEBUG);
-        $this->loop->cancelTimer($this->ready);
+        $this->loop->cancelTimer($this->timers['ready']);
+    }
+
+    /**
+     * Cancels a timer in the timer array.
+     *
+     * @param mixed $key
+     *
+     * @return void
+     */
+    public function cancelTimer($key)
+    {
+        if (! isset($this->timers[$key])) {
+            return;
+        }
+
+        $this->loop->cancelTimer($this->timers[$key]);
+        unset($this->timers[$key]);
     }
 }

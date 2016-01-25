@@ -21,7 +21,7 @@ class Ruleset extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'max_rounds', 'knife_round',
+        'name', 'config_file', 'max_rounds', 'knife_round',
         'overtime_enabled', 'overtime_start_money', 'overtime_max_round',
     ];
 

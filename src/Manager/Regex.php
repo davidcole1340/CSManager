@@ -25,6 +25,7 @@ class Regex
         'connected' => [
             'class' => \Manager\Events\UserConnected::class,
             'pattern' => '/L [0-9\/]+ - [0-9:]+ "(.+)<([0-9]+)><([A-Z_0-9:]+)><>" connected, address ""/',
+            'ignore' => true,
         ],
         'disconnected' => [
             'class' => \Manager\Events\UserDisconnected::class,
@@ -39,7 +40,6 @@ class Regex
         'entered_the_game' => [
             'class' => \Manager\Events\UserEnteredTheGame::class,
             'pattern' => '/L [0-9\/]+ - [0-9:]+ "(.+)<([0-9]+)><([A-Z_0-9:]+)><>" entered the game/',
-            'ignore' => true,
         ],
 
         /*
@@ -58,10 +58,12 @@ class Regex
         'user_killed' => [
             'class' => \Manager\Events\UserKilled::class,
             'pattern' => '/L [0-9\/]+ - [0-9:]+ "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>" \[([-0-9]+) ([-0-9]+) ([-0-9]+)\] killed "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>" \[([-0-9]+) ([-0-9]+) ([-0-9]+)\] with "([a-zA-Z0-9]+)"/',
+            'in_game' => true,
         ],
         'user_assisted' => [
             'class' => \Manager\Events\UserAssisted::class,
             'pattern' => '/L [0-9\/]+ - [0-9:]+ "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>" assisted killing "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>"/',
+            'in_game' => true,
         ],
         'threw_something' => [
             'class' => \Manager\Events\UserThrewSomething::class,
@@ -83,10 +85,12 @@ class Regex
         'nonuser_triggered_event' => [
             'class' => \Manager\Events\NonUserTriggeredEvent::class,
             'pattern' => '/L [0-9\/]+ - [0-9:]+ ([A-Za-z]+) triggered "(.+)"/',
+            'in_game' => true,
         ],
         'user_triggered_event' => [
             'class' => \Manager\Events\UserTriggeredEvent::class,
             'pattern' => '/L [0-9\/]+ - [0-9:]+ "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>" triggered "(.+)"/',
+            'in_game' => true,
         ],
         'round_end' => [
             'class' => \Manager\Events\RoundEnd::class,
@@ -95,6 +99,8 @@ class Regex
         'team_triggered_event' => [
             'class' => \Manager\Events\TeamTriggeredEvent::class,
             'pattern' => '/L [0-9\/]+ - [0-9:]+ Team "([A-Z]+)" triggered "([A-Za-z_]+)" \(([A-Z]+) "([0-9]+")\) \(([A-Z]+) "([0-9]+")\)/',
+            'ignore' => true,
+            'in_game' => true,
         ],
 
         /*
@@ -135,6 +141,10 @@ class Regex
 
         foreach ($this->patterns as $regex) {
             if (isset($regex['ignore']) && $regex['ignore']) {
+                continue;
+            }
+
+            if (isset($regex['in_game']) && $regex['in_game'] && ! $this->map->inGame()) {
                 continue;
             }
 

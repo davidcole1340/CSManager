@@ -91,12 +91,12 @@ $udp->createServer("{$config['udp']['bind']['ip']}:{$config['udp']['bind']['port
     die(1);
 });
 
-$loop->addPeriodicTimer(3, function () use ($udp, &$mapsInProgress, &$loop) {
+$loop->addPeriodicTimer(3, function () use ($udp, &$mapsInProgress, &$loop, &$config) {
     Logger::log('Looking for maps...', Logger::LEVEL_INFO);
-    $maps = Map::where('status', 2)->get();
+    $maps = Map::where('status', 1)->get();
 
     foreach ($maps as $map) {
-        $ipCheck = Map::where('status', '>=', 2)->where('status', '<', 12)->where('id', '!=', $map->id)->get();
+        $ipCheck = Map::where('status', '>=', 1)->where('status', '<', 11)->where('id', '!=', $map->id)->get();
         $inUse = false;
 
         foreach ($ipCheck as $mapCheck) {
@@ -110,9 +110,6 @@ $loop->addPeriodicTimer(3, function () use ($udp, &$mapsInProgress, &$loop) {
         if (! $inUse) {
             Logger::log("Map #{$map->id} starting on server #{$map->match->server->id}.");
             $handler = new Handler($map, $stream, $config, $loop);
-            $handler->addLoopClosure('onceTimer', function ($length, callable $closure) use (&$loop) {
-                return $loop->addTimer($Length, $closure);
-            });
             $handler->initMap();
 
             $mapsInProgress[$map->match->server->ip.':'.$map->match->server->port] = [

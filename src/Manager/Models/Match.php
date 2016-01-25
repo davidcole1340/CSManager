@@ -21,7 +21,7 @@ class Match extends Model
      * @var array
      */
     protected $fillable = [
-        'event_id', 'server_id', 'team_a', 'team_b', 'ruleset',
+        'event_id', 'server_id', 'team_a', 'team_b', 'ruleset_id',
         'status', 'starting', 'password', 'auth_key', 'best_of',
     ];
 

@@ -25,6 +25,7 @@ class Rulesets
         $table->increments('id');
 
         $table->string('name');
+        $table->string('config_file')->default('esl5on5');
 
         $table->integer('max_rounds')->default(15);
 

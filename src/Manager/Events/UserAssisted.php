@@ -40,7 +40,7 @@ class UserAssisted extends Event
         $re->map_id = $this->map->id;
         $re->current_round = $this->map->score_a + $this->map->score_b + 1;
         $re->type = 'assisted_in_killing';
-        $re->text = [
+        $re->data = [
             'attacker' => $attacker->id,
             'attacked' => $attacked->id,
         ];
