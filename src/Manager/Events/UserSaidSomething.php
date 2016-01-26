@@ -291,7 +291,6 @@ class UserSaidSomething extends Event
 
                 $this->handler->cancelTimer('staySwitch');
 
-                $this->dispatch(SetupTeams::class);
                 $this->dispatch(StartWarmup::class);
             }
         }
