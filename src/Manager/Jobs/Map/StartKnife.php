@@ -34,13 +34,11 @@ class StartKnife extends Job
         $this->rcon->exec('mp_restartgame 3;');
 
         $this->handler->loop->addTimer(4, function () {
-            $this->handler->chat->sendMessage('KNIFE!');
-
             ++$this->map->status;
             $this->map->save();
 
             for ($i = 0; $i < 3; ++$i) {
-                $this->handler->chat->sendMessage('LIVE!');
+                $this->handler->chat->sendMessage('KNIFE!');
             }
         });
     }

@@ -11,6 +11,7 @@
 
 namespace Manager\Events;
 
+use Illuminate\Support\Str;
 use Manager\Event;
 use Manager\Models\Player;
 use Manager\Models\RoundEvent;
@@ -35,8 +36,6 @@ class UserKilled extends Event
 
         ++$attacker->kills;
         ++$attacked->deaths;
-        $attacker->save();
-        $attacked->save();
 
         $re = new RoundEvent();
         $re->map_id = $this->map->id;
@@ -50,5 +49,12 @@ class UserKilled extends Event
             'weapon' => $matches[15],
         ];
         $re->save();
+
+        if (Str::contains($matches[16], 'headshot')) {
+            ++$attacker->headshots;
+        }
+
+        $attacker->save();
+        $attacked->save();
     }
 }

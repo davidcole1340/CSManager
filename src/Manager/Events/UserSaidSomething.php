@@ -49,8 +49,6 @@ class UserSaidSomething extends Event
 
         if (isset($handle[substr($message, 1)])) {
             $this->{$handle[substr($message, 1)]}($matches);
-        } else {
-            Logger::log("message {$message} shouldn't be handled", Logger::LEVEL_DEBUG);
         }
     }
 
@@ -150,6 +148,44 @@ class UserSaidSomething extends Event
     public function handlePause($matches)
     {
         if ($this->map->inGame() && ! $this->map->is_paused) {
+            $team = $matches[4];
+
+            if ($team == 'TERRORIST') {
+                if ($this->map->current_side == 't') {
+                    $team = $this->map->match->teamA;
+                    $this->map->team_paused = 'a';
+                } else {
+                    $team = $this->map->match->teamB;
+                    $this->map->team_paused = 'b';
+                }
+            } else {
+                if ($this->map->current_side == 't') {
+                    $team = $this->map->match->teamB;
+                    $this->map->team_paused = 'b';
+                } else {
+                    $team = $this->map->match->teamA;
+                    $this->map->team_paused = 'a';
+                }
+            }
+
+            $this->map->is_paused = true;
+            $this->map->save();
+            $this->rcon->exec('mp_pause_match;');
+            $this->handler->chat->sendMessage("{$team->name} has paused the game.");
+
+            if (isset($this->handler->config['match']['pause']['time_limit'])) {
+                $timelimit = $this->handler->config['match']['pause']['time_limit'];
+
+                $this->handler->chat->sendMessage("Match will be unpaused in {$timelimit} second(s).");
+                $this->handler->timers['unpause'] = $this->handler->loop->addTimer($timelimit, function () use ($timelimit) {
+                    $this->map->team_paused = null;
+                    $this->map->team_a_unpause = false;
+                    $this->map->team_b_unpause = false;
+                    $this->map->is_paused = false;
+                    $this->map->save();
+                    $this->handler->chat->sendMessage("Match unpaused due to being paused for {$timelimit} second(s).");
+                });
+            }
         }
     }
 
@@ -162,6 +198,42 @@ class UserSaidSomething extends Event
      */
     public function handleUnpause($matches)
     {
+        if ($this->map->is_paused) {
+            $team = $matches[4];
+
+            if ($team == 'TERRORIST') {
+                if ($this->map->current_side == 't') {
+                    $team = $this->map->match->teamA;
+                    $this->map->team_a_unpause = true;
+                } else {
+                    $team = $this->map->match->teamB;
+                    $this->map->team_b_unpause = true;
+                }
+            } else {
+                if ($this->map->current_side == 't') {
+                    $team = $this->map->match->teamB;
+                    $this->map->team_b_unpause = true;
+                } else {
+                    $team = $this->map->match->teamA;
+                    $this->map->team_a_unpause = true;
+                }
+            }
+
+            $this->map->save();
+
+            if ($this->map->team_a_unpause && $this->map->team_b_unpause) {
+                $this->handler->cancelTimer('unpause');
+                $this->map->team_paused = null;
+                $this->map->team_a_unpause = false;
+                $this->map->team_b_unpause = false;
+                $this->map->is_paused = false;
+                $this->map->save();
+                $this->handler->chat->sendMessage("Match has been unpaused.");
+                return;
+            }
+
+            $this->handler->chat->sendMessage("{$team->name} wants to unpause. Type !unpause ");
+        }
     }
 
     /**

@@ -52,6 +52,9 @@ class Maps
          */
         $table->integer('status')->default(0);
         $table->boolean('is_paused')->default(false);
+        $table->string('team_paused')->nullable();
+        $table->boolean('team_a_unpause')->default(false);
+        $table->boolean('team_b_unpause')->default(false);
 
         $table->string('current_side')->default('ct');
 

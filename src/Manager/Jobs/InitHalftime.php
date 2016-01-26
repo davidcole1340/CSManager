@@ -22,6 +22,7 @@ class InitHalftime extends Job
      */
     public function execute()
     {
-        $this->rcon->exec('mp_halftime 1; mp_halftime_duration 60; mp_halftime_pausetimer 1;');
+        $this->rcon->exec('mp_halftime 1; mp_halftime_duration 3; mp_halftime_pausetimer 1;');
+        $this->handler->initSayReady();
     }
 }

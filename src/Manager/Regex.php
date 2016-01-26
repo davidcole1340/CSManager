@@ -57,7 +57,7 @@ class Regex
         ],
         'user_killed' => [
             'class' => \Manager\Events\UserKilled::class,
-            'pattern' => '/L [0-9\/]+ - [0-9:]+ "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>" \[([-0-9]+) ([-0-9]+) ([-0-9]+)\] killed "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>" \[([-0-9]+) ([-0-9]+) ([-0-9]+)\] with "([a-zA-Z0-9]+)"/',
+            'pattern' => '/L [0-9\/]+ - [0-9:]+ "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>" \[([-0-9]+) ([-0-9]+) ([-0-9]+)\] killed "(.+)<([0-9]+)><([A-Z_0-9:]+)><([A-Za-z]+)>" \[([-0-9]+) ([-0-9]+) ([-0-9]+)\] with "([a-zA-Z0-9]+)"(.*)/',
             'in_game' => true,
         ],
         'user_assisted' => [
@@ -98,9 +98,7 @@ class Regex
         ],
         'team_triggered_event' => [
             'class' => \Manager\Events\TeamTriggeredEvent::class,
-            'pattern' => '/L [0-9\/]+ - [0-9:]+ Team "([A-Z]+)" triggered "([A-Za-z_]+)" \(([A-Z]+) "([0-9]+")\) \(([A-Z]+) "([0-9]+")\)/',
-            'ignore' => true,
-            'in_game' => true,
+            'pattern' => '/L [0-9\/]+ - [0-9:]+ Team "([A-Z]+)" triggered "([A-Za-z_]+)" \(([A-Z]+) "([0-9]+)"\) \(([A-Z]+) "([0-9]+)"\)/',
         ],
 
         /*

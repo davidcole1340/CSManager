@@ -12,6 +12,7 @@
 namespace Manager\Events;
 
 use Manager\Event;
+use Manager\Jobs\InitHalftime;
 use Manager\Jobs\StartWarmup;
 use Manager\Models\RoundEvent;
 
@@ -26,6 +27,7 @@ class RoundEnd extends Event
      */
     public function handle($matches)
     {
+        return;
         list(, $side, $score) = $matches;
 
         if ($score == 0) {
@@ -91,7 +93,7 @@ class RoundEnd extends Event
             ++$this->map->status;
             $this->map->save();
 
-            $this->dispatch(StartWarmup::class);
+            $this->dispatch(InitHalftime::class);
         }
     }
 }
